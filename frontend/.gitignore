@@ -1,1 +1,29 @@
-/target
+# Rust
+/target/
+**/*.rs.bk
+
+# WebAssembly
+/pkg/
+*.wasm
+*.wasm.map
+
+# MacOS
+.DS_Store
+
+# Logs
+*.log
+
+# Backup files
+*~
+
+# Node (si tu as une partie frontend avec npm/yarn)
+node_modules/
+dist/
+
+# VSCode
+.vscode/
+
+# Environment files
+.env
+.env.local
+.env.*
