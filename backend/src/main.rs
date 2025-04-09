@@ -2,13 +2,14 @@ mod db;
 mod controllers;
 mod models;
 
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, put, App, HttpResponse, HttpServer, Responder};
 use std::env;
 use dotenvy::dotenv;
 use controllers::health_controller::health_check;
 
 use controllers::risk_controller::get_all_risks;
 use controllers::risk_controller::{create_risk, update_risk, delete_risk, update_risk_status, get_risk_history, create_evaluation, get_evaluation, get_critical_risks};
+use controllers::incident_handler::{get_all_incidents, create_incident, get_incident_by_id, update_incident, delete_incident}; // Importation de delete_incident
 use actix_web::web;
 
 #[get("/")]
@@ -48,6 +49,11 @@ async fn main() -> std::io::Result<()> {
             .service(create_evaluation)
             .service(get_evaluation)
             .service(get_critical_risks)
+            .service(create_incident) // Ajout de create_incident
+            .service(get_all_incidents) // Ajout de get_all_incidents
+            .service(get_incident_by_id) // Ajout de get_incident_by_id
+            .service(update_incident) // Ajout de update_incident
+            .service(delete_incident) // Ajout de delete_incident
     })
     .bind(("127.0.0.1", port.parse::<u16>().unwrap()))?
     .run()
