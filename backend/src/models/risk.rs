@@ -44,6 +44,11 @@ pub struct DbRisk {
     pub status: RiskStatus,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub external_id: Option<String>,
+    pub category: Option<String>,
+    pub location: Option<String>,
+    pub regulation: Option<String>,
+    pub control_measure_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
@@ -56,6 +61,11 @@ pub struct Risk {
     pub status: RiskStatus,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub external_id: Option<String>,
+    pub category: Option<String>,
+    pub location: Option<String>,
+    pub regulation: Option<String>,
+    pub control_measure_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub score: Option<i32>, // <-- Calculé manuellement
@@ -66,6 +76,26 @@ pub struct Risk {
 pub struct NewRisk {
     pub title: String,
     pub description: Option<String>,
+    pub external_id: Option<String>,
+    pub tags: Option<Vec<String>>,
+    pub risk_map: Option<String>,
+    pub threat_map: Option<String>,
+    pub category: Option<String>,
+    pub location: Option<String>,
+    pub regulation: Option<String>,
+    pub control_measure_id: Option<String>,
+    pub assets: Option<Vec<String>>,
+    pub technology: Option<String>,
+    pub team: Option<String>,
+    pub stakeholders: Option<Vec<String>>,
+    pub owner: Option<String>,
+    pub owner_delegate: Option<String>,
+    pub source: Option<String>,
+    pub evaluation_method: Option<String>,
     pub impact: i32,
     pub probability: i32,
+    pub evaluation_notes: Option<String>,
+    pub additional_notes: Option<String>,
+    pub file_attachment: Option<String>,
+    pub status: Option<RiskStatus>,
 }

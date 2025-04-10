@@ -4,6 +4,11 @@ pub struct CriticalRisk {
     pub title: String,
     pub status: RiskStatus,
     pub score: i32,
+    pub external_id: Option<String>,
+    pub category: Option<String>,
+    pub location: Option<String>,
+    pub regulation: Option<String>,
+    pub control_measure_id: Option<String>,
 }
 
 use actix_web::{get, web, HttpResponse, Responder, post, put, delete, patch};
@@ -55,6 +60,11 @@ pub async fn get_all_risks(db_pool: web::Data<PgPool>) -> impl Responder {
                     status: r.status,
                     created_at: r.created_at,
                     updated_at: r.updated_at,
+                    external_id: r.external_id,
+                    category: r.category,
+                    location: r.location,
+                    regulation: r.regulation,
+                    control_measure_id: r.control_measure_id,
                 })
                 .collect();
 
@@ -74,15 +84,24 @@ pub async fn create_risk(
 ) -> impl Responder {
     let result = sqlx::query_as::<_, DbRisk>(
         r#"
-        INSERT INTO risks (title, description, impact, probability)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO risks (
+            title, description, external_id, category, location, regulation,
+            control_measure_id, impact, probability, status
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING *;
         "#
     )
     .bind(&risk.title)
     .bind(&risk.description)
+    .bind(&risk.external_id)
+    .bind(&risk.category)
+    .bind(&risk.location)
+    .bind(&risk.regulation)
+    .bind(&risk.control_measure_id)
     .bind(risk.impact)
     .bind(risk.probability)
+    .bind(&risk.status)
     .fetch_one(db_pool.get_ref())
     .await;
 
@@ -98,6 +117,11 @@ pub async fn create_risk(
                 created_at: db_risk.created_at,
                 updated_at: db_risk.updated_at,
                 score: Some(db_risk.impact * db_risk.probability),
+                external_id: db_risk.external_id,
+                category: db_risk.category,
+                location: db_risk.location,
+                regulation: db_risk.regulation,
+                control_measure_id: db_risk.control_measure_id,
             };
             HttpResponse::Ok().json(full_risk)
         }
@@ -116,20 +140,32 @@ pub async fn update_risk(
 ) -> impl Responder {
     let id = path.into_inner();
 
-    let result = sqlx::query_as::<_, Risk>(
+    let result = sqlx::query_as::<_, DbRisk>(
         r#"
         UPDATE risks
         SET title = $1,
             description = $2,
-            impact = $3,
-            probability = $4,
+            external_id = $3,
+            category = $4,
+            location = $5,
+            regulation = $6,
+            control_measure_id = $7,
+            impact = $8,
+            probability = $9,
             updated_at = NOW()
-        WHERE id = $5
-        RETURNING *;
+        WHERE id = $10
+        RETURNING id, title, description, impact, probability, status,
+          created_at, updated_at,
+          external_id, category, location, regulation, control_measure_id;
         "#,
     )
     .bind(&updated_risk.title)
     .bind(&updated_risk.description)
+    .bind(&updated_risk.external_id)
+    .bind(&updated_risk.category)
+    .bind(&updated_risk.location)
+    .bind(&updated_risk.regulation)
+    .bind(&updated_risk.control_measure_id)
     .bind(updated_risk.impact)
     .bind(updated_risk.probability)
     .bind(id)
@@ -137,7 +173,25 @@ pub async fn update_risk(
     .await;
 
     match result {
-        Ok(risk) => HttpResponse::Ok().json(risk),
+        Ok(db_risk) => {
+            let risk = Risk {
+                id: db_risk.id,
+                title: db_risk.title,
+                description: db_risk.description,
+                impact: db_risk.impact,
+                probability: db_risk.probability,
+                status: db_risk.status,
+                created_at: db_risk.created_at,
+                updated_at: db_risk.updated_at,
+                score: Some(db_risk.impact * db_risk.probability),
+                external_id: db_risk.external_id,
+                category: db_risk.category,
+                location: db_risk.location,
+                regulation: db_risk.regulation,
+                control_measure_id: db_risk.control_measure_id,
+            };
+            HttpResponse::Ok().json(risk)
+        },
         Err(e) => {
             eprintln!("Erreur mise à jour : {:?}", e);
             HttpResponse::InternalServerError().finish()
@@ -219,6 +273,11 @@ pub async fn update_risk_status(
                 status: db_risk.status,
                 created_at: db_risk.created_at,
                 updated_at: db_risk.updated_at,
+                external_id: db_risk.external_id,
+                category: db_risk.category,
+                location: db_risk.location,
+                regulation: db_risk.regulation,
+                control_measure_id: db_risk.control_measure_id,
             };
 
             // Historiser le changement de statut
@@ -354,6 +413,49 @@ pub async fn get_critical_risks(
         Ok(risks) => HttpResponse::Ok().json(risks),
         Err(err) => {
             eprintln!("Erreur récupération risques critiques : {:?}", err);
+            HttpResponse::InternalServerError().finish()
+        }
+    }
+}
+#[get("/risks/{id}")]
+pub async fn get_risk_by_id(
+    db_pool: web::Data<PgPool>,
+    path: web::Path<Uuid>,
+) -> impl Responder {
+    let id = path.into_inner();
+
+    let result = sqlx::query_as::<_, DbRisk>(
+        r#"
+        SELECT * FROM risks WHERE id = $1;
+        "#
+    )
+    .bind(id)
+    .fetch_optional(db_pool.get_ref())
+    .await;
+
+    match result {
+        Ok(Some(db_risk)) => {
+            let risk = Risk {
+                id: db_risk.id,
+                title: db_risk.title,
+                description: db_risk.description,
+                impact: db_risk.impact,
+                probability: db_risk.probability,
+                status: db_risk.status,
+                created_at: db_risk.created_at,
+                updated_at: db_risk.updated_at,
+                external_id: db_risk.external_id,
+                category: db_risk.category,
+                location: db_risk.location,
+                regulation: db_risk.regulation,
+                control_measure_id: db_risk.control_measure_id,
+                score: Some(db_risk.impact * db_risk.probability),
+            };
+            HttpResponse::Ok().json(risk)
+        }
+        Ok(None) => HttpResponse::NotFound().body("Risque non trouvé"),
+        Err(e) => {
+            eprintln!("Erreur récupération du risque : {:?}", e);
             HttpResponse::InternalServerError().finish()
         }
     }
