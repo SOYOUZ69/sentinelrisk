@@ -3,14 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <title>SentinelRisk UI</title>
-  <link rel="modulepreload" href="/frontend-2b13a9cdf07362e2.js" crossorigin="anonymous" integrity="sha384-+ZUodmGfYhzpDExp7ZxQpLidJTJVt1eP+aK7X+DYMslrDVUbTvfgjgCroqSnPQqn"><link rel="preload" href="/frontend-2b13a9cdf07362e2_bg.wasm" crossorigin="anonymous" integrity="sha384-YpIQRr14dLSTPHLUWxYRYFEBHXr9M5HD4lIQBcxX76L9K8Vk2B5Dmp8XUHui1Jev" as="fetch" type="application/wasm"></head>
+    <head>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="modulepreload" href="/frontend-7b55e6cd148d41e5.js" crossorigin="anonymous" integrity="sha384-X4PcFEBRKHBn8g5mz8o3BeRd7LQKi7TjgjAn3FpMO1gB4/zsa0FxL/1Lr2KPxmbK"><link rel="preload" href="/frontend-7b55e6cd148d41e5_bg.wasm" crossorigin="anonymous" integrity="sha384-HAhYr3nIWwp9974cU+GMtz21jT/cfr9TevZbaLcyJ5o7KOwQ065dXpJSmsLkx3Ie" as="fetch" type="application/wasm"></head>  <link rel="modulepreload" href="/frontend-7b55e6cd148d41e5.js" crossorigin="anonymous" integrity="sha384-X4PcFEBRKHBn8g5mz8o3BeRd7LQKi7TjgjAn3FpMO1gB4/zsa0FxL/1Lr2KPxmbK"><link rel="preload" href="/frontend-7b55e6cd148d41e5_bg.wasm" crossorigin="anonymous" integrity="sha384-HAhYr3nIWwp9974cU+GMtz21jT/cfr9TevZbaLcyJ5o7KOwQ065dXpJSmsLkx3Ie" as="fetch" type="application/wasm"></head>
   <body>
     <main></main>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">import init from './pkg/frontend.js'; init();</script>
   
 <script type="module">
-import init, * as bindings from '/frontend-2b13a9cdf07362e2.js';
-const wasm = await init({ module_or_path: '/frontend-2b13a9cdf07362e2_bg.wasm' });
+import init, * as bindings from '/frontend-7b55e6cd148d41e5.js';
+const wasm = await init({ module_or_path: '/frontend-7b55e6cd148d41e5_bg.wasm' });
 
 
 window.wasmBindings = bindings;

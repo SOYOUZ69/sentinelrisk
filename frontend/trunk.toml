@@ -1,0 +1,6 @@
+[build]
+dist = "dist"  # Ce répertoire où le CSS sera compilé doit être servi par Trunk
+
+[[copy]]
+source = "./public/tailwind.css"
+target = "/public/tailwind.css"

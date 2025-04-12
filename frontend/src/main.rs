@@ -7,6 +7,8 @@ use pages::risk_list::RiskList;
 use pages::add_risk::AddRisk;
 use pages::edit_risk::EditRisk;
 use pages::view_risk::ViewRisk;
+mod components;
+use components::sidebar::Sidebar;
 
 #[derive(Routable, PartialEq, Clone, Debug)]
 enum Route {
@@ -29,13 +31,12 @@ enum Route {
 fn app() -> Html {
     html! {
         <BrowserRouter>
-            <nav>
-                <ul>
-                    <li><Link<Route> to={Route::Risks}>{ "Liste des Risques" }</Link<Route>></li>
-                    <li><Link<Route> to={Route::AddRisk}>{ "Ajouter un Risque" }</Link<Route>></li>
-                </ul>
-            </nav>
-            <Switch<Route> render={switch} />
+            <div style="display: flex;">
+                <Sidebar />
+                <div style="flex: 1; padding: 1rem;">
+                    <Switch<Route> render={switch} />
+                </div>
+            </div>
         </BrowserRouter>
     }
 }
